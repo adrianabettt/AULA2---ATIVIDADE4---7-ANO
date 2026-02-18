@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Aula 2: Mural de Registros RPG</title>
+    <style>
+        :root {
+            --rpg-dark: #2c3e50;
+            --rpg-paper: #f4e4bc;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --postit: #fff176;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--rpg-dark);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            gap: 30px;
+        }
+
+        /* Lado Esquerdo: Formulário */
+        .painel-criacao {
+            background-color: var(--rpg-paper);
+            width: 350px;
+            padding: 25px;
+            border: 6px solid #8b4513;
+            border-radius: 5px;
+            position: sticky;
+            top: 20px;
+        }
+
+        /* Lado Direito: Mural de Post-its */
+        .mural {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            max-width: 600px;
+        }
+
+        .post-it {
+            background-color: var(--postit);
+            width: 180px;
+            padding: 15px;
+            border-bottom-right-radius: 30px;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
+            color: #333;
+            transform: rotate(-2deg);
+            animation: aparecer 0.5s ease-out;
+        }
+
+        @keyframes aparecer { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1) rotate(-2deg); } }
+
+        h1, h2 { text-align: center; color: #8b4513; margin-top: 0; }
+        .campo { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 8px; border: 2px solid #8b4513; box-sizing: border-box; }
+        
+        button {
+            width: 100%; padding: 12px; background-color: #8b4513; color: white;
+            border: none; font-weight: bold; cursor: pointer;
+        }
+
+        #feedback { margin-top: 15px; font-size: 0.85rem; font-weight: bold; display: none; padding: 10px; border-radius: 4px; }
+        .error-msg { background: #ffcdd2; color: var(--error); display: block !important; border: 1px solid var(--error); }
+    </style>
+</head>
+<body>
+
+<div class="painel-criacao">
+    <h2>📝 Criar Registro</h2>
+    <p style="font-size: 0.8rem; text-align: center;">Limite: 3 personagens</p>
+    
+    <div class="campo">
+        <label>NOME:</label>
+        <input type="text" id="nome" placeholder="Ex: Arqueiro">
+    </div>
+
+    <div class="campo">
+        <label>NÍVEL):</label>
+        <input type="text" id="nivel" placeholder="Ex: 5">
+    </div>
+
+    <div class="campo">
+        <label>PODER:</label>
+        <select id="poder">
+            <option value="">Selecione...</option>
+            <option value="🔥 Fogo">Bola de Fogo</option>
+            <option value="❄️ Gelo">Sopro de Gelo</option>
+            <option value="⚡ Raio">Relâmpago</option>
+        </select>
+    </div>
+
+    <button onclick="adicionarAoMural()">ADICIONAR AO MURAL</button>
+    <div id="feedback"></div>
+</div>
+
+<div class="mural" id="mural">
+    </div>
+
+<script>
+    let totalCriado = 0;
+
+    function adicionarAoMural() {
+        const feedback = document.getElementById('feedback');
+        const mural = document.getElementById('mural');
+        
+        if (totalCriado >= 3) {
+            feedback.innerHTML = "🚫 LIMITE ATINGIDO! Você já criou os 3 registros permitidos.";
+            feedback.className = "error-msg";
+            return;
+        }
+
+        const nome = document.getElementById('nome').value;
+        const nivel = document.getElementById('nivel').value;
+        const poder = document.getElementById('poder').value;
+
+        // Validações
+        if (!nome || !nivel || !poder) {
+            feedback.innerHTML = "❌ ERRO: Preencha todos os campos!";
+            feedback.className = "error-msg";
+            return;
+        }
+
+        if (isNaN(nivel)) {
+            feedback.innerHTML = "⚠️ ERRO DE TIPO: O sistema esperava um NÚMERO no Nível e você digitou um TEXTO!";
+            feedback.className = "error-msg";
+            return;
+        }
+
+        // Criar o Post-it (Registro Visual)
+        const novoPostIt = document.createElement('div');
+        novoPostIt.className = 'post-it';
+        novoPostIt.innerHTML = `
+            <strong>👤 REGISTRO #${totalCriado + 1}</strong><br><br>
+            <b>Nome:</b> ${nome}<br>
+            <b>Nível:</b> ${nivel}<br>
+            <b>Poder:</b> ${poder}
+        `;
+
+        mural.appendChild(novoPostIt);
+        
+        // Limpar campos e atualizar contador
+        totalCriado++;
+        feedback.style.display = 'none';
+        document.getElementById('nome').value = "";
+        document.getElementById('nivel').value = "";
+        document.getElementById('poder').value = "";
+
+        if(totalCriado === 3) {
+            feedback.innerHTML = "✅ MURAL COMPLETO! Você organizou 3 registros com sucesso.";
+            feedback.className = "feedback success-msg"; // (estilizada simples)
+            feedback.style.display = "block";
+            feedback.style.background = "#c8e6c9";
+            feedback.style.color = "#27ae60";
+        }
+    }
+</script>
+
+</body>
+</html>
